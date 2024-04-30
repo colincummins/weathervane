@@ -1,3 +1,4 @@
+from framed_text import FramedText
 
 # Constants
 TITLE = """
@@ -55,7 +56,14 @@ class App:
         print('Zipcode:',self.zip or "NONE (Press 'z' to set)")
 
     def display_quote(self):
-        print('A quote')
+        print()
+        print('Weathervane for', self.zip)
+        quote = "Into each life some rain must fall, but too much is falling in mine."
+        author = "Ralph Waldo Emerson"
+        framed = FramedText(quote, author)
+        framed.display()
+        print()
+
 
     def quit_program(self):
         exit(0)
