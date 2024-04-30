@@ -17,7 +17,7 @@ MENU = [
     "Type (A)bout to know more about Weathervane",
     "Type (Q)uit to end program"
 ]
-PROMPT = "[Enter/(z)ipcode/(a)bout/(q)uit]:"
+PROMPT = "[(Enter)/(z)ipcode/(a)bout/(q)uit]:"
 ABOUT = ""
 
 
