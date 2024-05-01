@@ -2,6 +2,7 @@ import os
 from framed_text import FramedText
 from Quote import Quote
 from voice_api import VoiceAPI
+from input_handler import InputHandler
 
 # Constants
 TITLE = """
@@ -48,6 +49,7 @@ class App:
             'a': self.display_about
         }
         self.voice_api = VoiceAPI()
+        self.input_handler = InputHandler()
 
     def display_title(self):
         print(self.title)
@@ -84,7 +86,7 @@ class App:
             self.voice_api.say_quote(quote.get_body(),quote.get_author())
 
     def toggle_voice(self):
-        self.voice = ~self.voice
+        self.voice = not self.voice
 
     def quit_program(self):
         exit(0)
@@ -93,7 +95,7 @@ class App:
         valid = False
         command = None
         while not valid:
-            command = input(PROMPT)
+            command = self.input_handler.input(PROMPT)
             command = command.lower() if command.isalpha() else command
             if command in self.commands:
                 valid = True
@@ -105,7 +107,7 @@ class App:
     def get_zipcode(self):
         valid = False
         while not valid:
-            zipcode = input('Enter Zipcode (XXXXX) or hit [enter] to reset: ')
+            zipcode = self.input_handler.input('Enter Zipcode (XXXXX) or hit [enter] to reset: ')
             if zipcode == "c":
                 return
             if zipcode == "" or self.validate_zip(zipcode):
