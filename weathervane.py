@@ -1,3 +1,4 @@
+import os
 from framed_text import FramedText
 from Quote import Quote
 from voice_api import VoiceAPI
@@ -131,5 +132,6 @@ class App:
 
 
 if __name__ == "__main__":
+    os.system("cls||clear")
     app = App()
     app.mainloop()
