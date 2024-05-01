@@ -132,6 +132,6 @@ class App:
 
 
 if __name__ == "__main__":
-    os.system("cls||clear")
+    os.system("cls||clear||")
     app = App()
     app.mainloop()
