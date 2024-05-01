@@ -76,11 +76,11 @@ class App:
             print()
             return
         quote = self.get_quote()
-        if self.voice:
-            self.voice_api.say_quote(quote.get_body(),quote.get_author())
         print()
         FramedText(quote.get_body(), header="Weathervane for " + self.zip, footer=quote.get_author()).display()
         print()
+        if self.voice:
+            self.voice_api.say_quote(quote.get_body(),quote.get_author())
 
     def toggle_voice(self):
         self.voice = ~self.voice
