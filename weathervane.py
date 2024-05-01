@@ -1,4 +1,6 @@
 from framed_text import FramedText
+from Quote import Quote
+from voice_api import VoiceAPI
 
 # Constants
 TITLE = """
@@ -44,6 +46,7 @@ class App:
             'v': self.toggle_voice,
             'a': self.display_about
         }
+        self.voice_api = VoiceAPI()
 
     def display_title(self):
         print(self.title)
@@ -73,6 +76,8 @@ class App:
             print()
             return
         quote = self.get_quote()
+        if self.voice:
+            self.voice_api.say_quote(quote.get_body(),quote.get_author())
         print()
         FramedText(quote.get_body(), header="Weathervane for " + self.zip, footer=quote.get_author()).display()
         print()
