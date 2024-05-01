@@ -15,10 +15,16 @@ MENU = [
     "Type (E)nter to hear quote inspired by your local weather (Quote will also print)",
     "Type (Z)ip to set/change/clear your zipcode (required)",
     "Type (A)bout to know more about Weathervane",
+    "Type (V) to toggle voice mode >>>NEW<<<",
     "Type (Q)uit to end program"
 ]
-PROMPT = "[(Enter)/(z)ipcode/(a)bout/(q)uit]:"
-ABOUT = ""
+PROMPT = "[(Enter)/(z)ipcode/(a)bout/(v)oice/(q)uit]:"
+ABOUT = ("I wrote Weathervane to inspire and inform users by displaying a random quote based on the weather forecast for\
+ their zip code. You can set your zipcode by pressing 'z'. You can change the zipcode by pressing 'z'. You can also\
+  just hit enter at the zipcode prompt to clear it. I would like to add the ability to save your zipcode, save\
+   favorite quotes, and email quotes to others")
+DUMMY_QUOTE = 'Into each life some rain must fall, but too much is falling in mine.'
+DUMMY_AUTHOR = 'Ralph Waldo Emerson'
 
 
 class App:
@@ -27,13 +33,16 @@ class App:
         self.tagline = TAGLINE
         self.privacy_note = PRIVACY_NOTE
         self.menu = MENU
+        self.about = ABOUT
         self.zip = None
-        self.quote = None
         self.prompt = PROMPT
+        self.voice = False
         self.commands = {
             '': self.display_quote,
             'z': self.get_zipcode,
-            'q': self.quit_program
+            'q': self.quit_program,
+            'v': self.toggle_voice,
+            'a': self.display_about
         }
 
     def display_title(self):
@@ -52,18 +61,24 @@ class App:
         print(*self.menu,sep="\n")
         print()
 
-    def display_zip(self):
-        print('Zipcode:',self.zip or "NONE (Press 'z' to set)")
+    def display_status(self):
+        print('(Z)ipcode:',self.zip or "NONE (z to set)", "(V)oice Mode:", "ON" if self.voice else "OFF")
+
+    def get_quote(self):
+        return Quote(DUMMY_QUOTE,DUMMY_AUTHOR)
 
     def display_quote(self):
+        if not self.zip:
+            print("You must set a zipcode to receive weathervanes. Press (z) to enter.")
+            print()
+            return
+        quote = self.get_quote()
         print()
-        print('Weathervane for', self.zip)
-        quote = "Into each life some rain must fall, but too much is falling in mine."
-        author = "Ralph Waldo Emerson"
-        framed = FramedText(quote, author)
-        framed.display()
+        FramedText(quote.get_body(), header="Weathervane for " + self.zip, footer=quote.get_author()).display()
         print()
 
+    def toggle_voice(self):
+        self.voice = ~self.voice
 
     def quit_program(self):
         exit(0)
@@ -90,8 +105,15 @@ class App:
             if zipcode == "" or self.validate_zip(zipcode):
                 self.zip = zipcode
                 valid = True
+                print()
             else:
                 print('Invalid Zipcode. Please re-enter zip or hit [c] to cancel.')
+
+    def display_about(self):
+        print()
+        framed_text = FramedText(self.about, "About Weathervane")
+        framed_text.display()
+        print()
 
     def mainloop(self):
         self.display_title()
@@ -99,7 +121,7 @@ class App:
         self.display_privacy_note()
         self.display_menu()
         while True:
-            self.display_zip()
+            self.display_status()
             self.process_command()
 
 
