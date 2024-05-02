@@ -131,8 +131,8 @@ class App:
         self.display_title()
         self.display_tagline()
         self.display_privacy_note()
-        self.display_menu()
         while True:
+            self.display_menu()
             self.display_status()
             self.process_command()
 
