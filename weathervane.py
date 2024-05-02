@@ -1,8 +1,11 @@
 import os
+import re
+
 from framed_text import FramedText
 from Quote import Quote
 from voice_api import VoiceAPI
 from input_handler import InputHandler
+from re import match
 
 # Constants
 TITLE = """
@@ -103,12 +106,12 @@ class App:
                 self.commands[command]()
 
     def validate_zip(self, zipcode):
-        return zipcode == "" or zipcode.isnumeric()
+        return zipcode == "" or match(r'\d{5}-\d{4}|\d{5}|\d{9}', zipcode)
 
     def get_zipcode(self):
         valid = False
         while not valid:
-            zipcode = self.input_handler.input('Enter Zipcode (XXXXX) or hit [enter] to reset: ')
+            zipcode = self.input_handler.input('Enter Zipcode (5 or 9 digits) or hit [enter] to reset: ')
             if zipcode == "c":
                 return
             if zipcode == "" or self.validate_zip(zipcode):
