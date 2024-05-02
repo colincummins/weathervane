@@ -99,6 +99,7 @@ class App:
             command = command.lower() if command.isalpha() else command
             if command in self.commands:
                 valid = True
+                print()
                 self.commands[command]()
 
     def validate_zip(self, zipcode):
