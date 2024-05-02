@@ -10,7 +10,7 @@ class InputHandler:
     def on_press(self,key):
         if not self.message_displayed:
             self.message_displayed = True
-            print('Please Wait...\n')
+            print('Loading. Please Wait...\n')
 
     def input(self, prompt):
         self.listener.stop()
