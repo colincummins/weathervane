@@ -1,4 +1,4 @@
-def get_short_forecast(zipcode):
+def get_forecast(zipcode):
     # Takes in a zipcode and returns a short forecast as text string
 
     import requests, json, wv_config
@@ -13,8 +13,8 @@ def get_short_forecast(zipcode):
     forecast_url = points_data['properties']['forecast']
     forecast_page = requests.get(forecast_url, headers=authentication_header)
     forecast_data = forecast_page.json()
-    return forecast_data['properties']['periods'][0]['shortForecast'].lower()
+    return forecast_data['properties']['periods'][0]['detailedForecast'].lower()
 
 
 if __name__ == "__main__":
-    print(get_short_forecast('20001'))
+    print(get_forecast('20001'))
