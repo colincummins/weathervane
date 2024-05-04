@@ -17,4 +17,4 @@ def get_forecast(zipcode):
 
 
 if __name__ == "__main__":
-    print(get_forecast('55555'))
+    print(get_forecast("04662"))
