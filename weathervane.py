@@ -6,6 +6,8 @@ from Quote import Quote
 from voice_api import VoiceAPI
 from input_handler import InputHandler
 from re import match
+from forecast_to_quote import forecast_to_quote
+from get_forecast import get_forecast
 
 # Constants
 TITLE = """
@@ -74,19 +76,28 @@ class App:
         print('(Z)ipcode:',self.zip or "NONE (z to set)", "(V)oice Mode:", "ON" if self.voice else "OFF")
 
     def get_quote(self):
-        return Quote(DUMMY_QUOTE,DUMMY_AUTHOR)
+        forecast = get_forecast(self.zip)
+        body, author = forecast_to_quote(forecast)
+        new_quote = Quote(body, author)
+        return new_quote
+
+
 
     def display_quote(self):
         if not self.zip:
             print("You must set a zipcode to receive weathervanes. Press (z) to enter.")
             print()
             return
-        quote = self.get_quote()
-        print()
-        FramedText(quote.get_body(), header="Weathervane for " + self.zip, footer=quote.get_author()).display()
-        print()
-        if self.voice:
-            self.voice_api.say_quote(quote.get_body(),quote.get_author())
+        try:
+            quote = self.get_quote()
+            print()
+            FramedText(quote.get_body(), header="Weathervane for " + self.zip, footer=quote.get_author()).display()
+            print()
+            if self.voice:
+                self.voice_api.say_quote(quote.get_body(),quote.get_author())
+        except:
+            print('Invalid Zipcode. Please re-enter.\n')
+
 
     def toggle_voice(self):
         self.voice = not self.voice
