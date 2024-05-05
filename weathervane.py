@@ -45,7 +45,7 @@ class App:
         self.about = ABOUT
         self.zip = None
         self.prompt = PROMPT
-        self.voice = False
+        self.voice = True
         self.commands = {
             '': self.display_quote,
             'z': self.get_zipcode,
