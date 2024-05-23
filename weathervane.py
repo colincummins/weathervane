@@ -1,5 +1,4 @@
 import os
-import re
 
 from framed_text import FramedText
 from Quote import Quote
@@ -8,6 +7,7 @@ from input_handler import InputHandler
 from re import match
 from forecast_to_quote import forecast_to_quote
 from get_forecast import get_forecast
+from skrivenerAPI import SkrivenerAPI
 
 # Constants
 TITLE = """
@@ -24,7 +24,8 @@ MENU = [
     "Type (E)nter to hear quote inspired by your local weather (Quote will also print)",
     "Type (Z)ip to set/change/clear your zipcode (required)",
     "Type (A)bout to know more about Weathervane",
-    "Type (V) to toggle voice mode >>>NEW<<<",
+    "Type (I) to toggle image mode >>>NEW<<<",
+    "Type (V) to toggle voice mode",
     "Type (Q)uit to end program"
 ]
 PROMPT = "[(Enter)/(z)ipcode/(a)bout/(v)oice/(q)uit]:"
@@ -46,14 +47,17 @@ class App:
         self.zip = None
         self.prompt = PROMPT
         self.voice = True
+        self.image = True
         self.commands = {
             '': self.display_quote,
             'z': self.get_zipcode,
             'q': self.quit_program,
             'v': self.toggle_voice,
+            'i': self.toggle_image,
             'a': self.display_about
         }
         self.voice_api = VoiceAPI()
+        self.skrv = SkrivenerAPI()
         self.input_handler = InputHandler()
 
     def display_title(self):
@@ -73,7 +77,8 @@ class App:
         print()
 
     def display_status(self):
-        print('(Z)ipcode:',self.zip or "NONE (z to set)", "(V)oice Mode:", "ON" if self.voice else "OFF")
+        print('(Z)ipcode:',self.zip or "NONE (z to set)", "(I)mage Mode:","ON" if self.image else "OFF",\
+              "(V)oice Mode:", "ON" if self.voice else "OFF")
 
     def get_quote(self):
         forecast = get_forecast(self.zip)
@@ -88,20 +93,21 @@ class App:
             print("You must set a zipcode to receive weathervanes. Press (z) to enter.")
             print()
             return
-        try:
-            quote = self.get_quote()
-            print()
-            FramedText(quote.get_body(), header="Weathervane for " + self.zip, footer=quote.get_author()).display()
-            print()
-            if self.voice:
-                self.voice_api.say_quote(quote.get_body(),quote.get_author())
-        except:
-            print('Invalid Zipcode. Please re-enter.\n')
+        quote = self.get_quote()
+        print()
+        FramedText(quote.get_body(), header="Weathervane for " + self.zip, footer=quote.get_author()).display()
+        print()
+        if self.voice:
+            self.voice_api.say_quote(quote.get_body(),quote.get_author())
+        if self.image:
+            print("Displaying image...")
 
 
     def toggle_voice(self):
         self.voice = not self.voice
 
+    def toggle_image(self):
+        self.image = not self.image
     def quit_program(self):
         exit(0)
 
