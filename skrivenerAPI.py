@@ -8,10 +8,11 @@ class SkrivenerAPI:
     Acts as an endpoint for the Skrivener microservice
     Adapted from Skrivener README -  https://github.com/bcliden/skrivener?tab=readme-ov-file
     """
+
     def __init__(self, host="localhost", port="8672") -> None:
         context = zmq.Context()
         self.socket = context.socket(zmq.REQ)
-        self.socket.bind(f"tcp://{host}:{port}")
+        self.socket.connect(f"tcp://{host}:{port}")
 
     def text_to_img(self, text: str, bg_color: str = None, text_color: str = None) -> bytes:
         packet = {"text": text}

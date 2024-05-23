@@ -8,6 +8,8 @@ from re import match
 from forecast_to_quote import forecast_to_quote
 from get_forecast import get_forecast
 from skrivenerAPI import SkrivenerAPI
+from PIL import Image as im
+import io
 
 # Constants
 TITLE = """
@@ -28,7 +30,7 @@ MENU = [
     "Type (V) to toggle voice mode",
     "Type (Q)uit to end program"
 ]
-PROMPT = "[(Enter)/(z)ipcode/(a)bout/(v)oice/(q)uit]:"
+PROMPT = "[(Enter)/(z)ipcode/(a)bout/(i)mage/(v)oice/(q)uit]:"
 ABOUT = ("I wrote Weathervane to inspire and inform users by displaying a random quote based on the weather forecast for\
  their zip code. You can set your zipcode by pressing 'z'. You can change the zipcode by pressing 'z'. You can also\
   just hit enter at the zipcode prompt to clear it. I would like to add the ability to save your zipcode, save\
@@ -86,6 +88,15 @@ class App:
         new_quote = Quote(body, author)
         return new_quote
 
+    def render_quote(self, quote:Quote) -> None:
+        # Adapted from the Skrivener readme - https://github.com/bcliden/skrivener?tab=readme-ov-file
+        image_bytes = self.skrv.text_to_img(str(quote))
+        bytes_buffer = io.BytesIO(image_bytes)
+        image = im.open(bytes_buffer)
+        image.show()
+        image.save("wv.png",format="png")
+
+
 
 
     def display_quote(self):
@@ -100,7 +111,7 @@ class App:
         if self.voice:
             self.voice_api.say_quote(quote.get_body(),quote.get_author())
         if self.image:
-            print("Displaying image...")
+            self.render_quote(quote)
 
 
     def toggle_voice(self):
