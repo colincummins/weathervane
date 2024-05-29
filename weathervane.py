@@ -23,13 +23,14 @@ TAGLINE = "Weathervane - Get a quote inspired by today's weather!"
 PRIVACY_NOTE = "NOTE: This app requires you enter your zipcode \nwhich may be considered private information"
 MENU = [
     "Type (E)nter to hear quote inspired by your local weather (Quote will also print)",
-    "Type (Z)ip to set/change/clear your zipcode (required)",
+    "Type (L)ocation to set/change/clear your location (required)",
     "Type (A)bout to know more about Weathervane",
     "Type (I) to toggle image mode >>>NEW<<<",
     "Type (V) to toggle voice mode",
+    "Type (Z) to toggle zipcode display",
     "Type (Q)uit to end program"
 ]
-PROMPT = "[(Enter)/(z)ipcode/(a)bout/(i)mage/(v)oice/(q)uit]:"
+PROMPT = "[(Enter)/(L)ocation/(A)bout/(I)mage/(V)oice/(Z)ipcode Display/(Q)uit]:"
 ABOUT = ("I wrote Weathervane to inspire and inform users by displaying a random quote based on the weather forecast for\
  their zip code. You can set your zipcode by pressing 'z'. You can change the zipcode by pressing 'z'. You can also\
   just hit enter at the zipcode prompt to clear it. I would like to add the ability to save your zipcode, save\
@@ -49,12 +50,14 @@ class App:
         self.prompt = PROMPT
         self.voice = True
         self.image = True
-        self.commands = {
+        self.display_zip = True
+        self.menu_commands = {
             '': self.display_quote,
-            'z': self.get_location,
+            'l': self.input_location,
             'q': self.quit_program,
             'v': self.toggle_voice,
             'i': self.toggle_image,
+            'z': self.toggle_zip_display,
             'a': self.display_about
         }
         self.voice_api = VoiceAPI()
@@ -77,8 +80,15 @@ class App:
         print(*self.menu, sep="\n")
         print()
 
+    def get_location_display(self):
+        if self.location is None:
+            return None
+        if self.display_zip:
+            return self.location['zip']
+        return self.location['placename']
+
     def display_status(self):
-        print('(L)ocation:', self.location or "NONE ('L' to set)", "(I)mage Mode:", "ON" if self.image else "OFF", \
+        print('(L)ocation:', self.get_location_display() or "NONE ('L' to set)", "(I)mage Mode:", "ON" if self.image else "OFF", \
               "(V)oice Mode:", "ON" if self.voice else "OFF")
 
     def get_quote(self):
@@ -115,6 +125,9 @@ class App:
     def toggle_image(self):
         self.image = not self.image
 
+    def toggle_zip_display(self):
+        self.display_zip = not self.display_zip
+
     def quit_program(self):
         exit(0)
 
@@ -124,12 +137,12 @@ class App:
         while not valid:
             command = input(PROMPT)
             command = command.lower() if command.isalpha() else command
-            if command in self.commands:
+            if command in self.menu_commands:
                 valid = True
                 print()
-                self.commands[command]()
+                self.menu_commands[command]()
 
-    def get_location(self):
+    def input_location(self):
         valid = False
         while not valid:
             user_input = input('Enter location or press [enter] to reset: ')
@@ -137,10 +150,12 @@ class App:
                 return
             if user_input == "":
                 self.location = None
-            else
-
-            else:
-                print('Invalid Zipcode. Please re-enter zip or hit [c] to cancel.')
+                return
+            try:
+                self.location = self.zipf.get_location(user_input)
+                valid = True
+            except Exception as e:
+                print(e)
 
     def display_about(self):
         print()
