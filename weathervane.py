@@ -8,6 +8,7 @@ from re import match
 from forecast_to_quote import forecast_to_quote
 from get_forecast import get_forecast
 from skrivenerAPI import SkrivenerAPI
+from zipfinderAPI import ZipfinderAPI
 from PIL import Image as im
 import io
 
@@ -46,13 +47,13 @@ class App:
         self.privacy_note = PRIVACY_NOTE
         self.menu = MENU
         self.about = ABOUT
-        self.zip = None
+        self.location = None
         self.prompt = PROMPT
         self.voice = True
         self.image = True
         self.commands = {
             '': self.display_quote,
-            'z': self.get_zipcode,
+            'z': self.get_location,
             'q': self.quit_program,
             'v': self.toggle_voice,
             'i': self.toggle_image,
@@ -60,7 +61,7 @@ class App:
         }
         self.voice_api = VoiceAPI()
         self.skrv = SkrivenerAPI()
-        self.input_handler = InputHandler()
+        self.zipf = ZipfinderAPI()
 
     def display_title(self):
         print(self.title)
@@ -75,50 +76,47 @@ class App:
 
     def display_menu(self):
         print("MENU:")
-        print(*self.menu,sep="\n")
+        print(*self.menu, sep="\n")
         print()
 
     def display_status(self):
-        print('(Z)ipcode:',self.zip or "NONE (z to set)", "(I)mage Mode:","ON" if self.image else "OFF",\
+        print('(L)ocation:', self.location or "NONE ('L' to set)", "(I)mage Mode:", "ON" if self.image else "OFF", \
               "(V)oice Mode:", "ON" if self.voice else "OFF")
 
     def get_quote(self):
-        forecast = get_forecast(self.zip)
+        forecast = get_forecast(self.location['zip'])
         body, author = forecast_to_quote(forecast)
         new_quote = Quote(body, author)
         return new_quote
 
-    def render_quote(self, quote:Quote) -> None:
+    def render_quote(self, quote: Quote) -> None:
         # Adapted from the Skrivener readme - https://github.com/bcliden/skrivener?tab=readme-ov-file
         image_bytes = self.skrv.text_to_img(str(quote))
         bytes_buffer = io.BytesIO(image_bytes)
         image = im.open(bytes_buffer)
         image.show()
-        image.save("wv.png",format="png")
-
-
-
+        image.save("wv.png", format="png")
 
     def display_quote(self):
-        if not self.zip:
-            print("You must set a zipcode to receive weathervanes. Press (z) to enter.")
+        if not self.location:
+            print("You must set a location to receive weathervanes. Press (L) to enter.")
             print()
             return
         quote = self.get_quote()
         print()
-        FramedText(quote.get_body(), header="Weathervane for " + self.zip, footer=quote.get_author()).display()
+        FramedText(quote.get_body(), header="Weathervane for " + self.location['placename'], footer=quote.get_author()).display()
         print()
         if self.voice:
-            self.voice_api.say_quote(quote.get_body(),quote.get_author())
+            self.voice_api.say_quote(quote.get_body(), quote.get_author())
         if self.image:
             self.render_quote(quote)
-
 
     def toggle_voice(self):
         self.voice = not self.voice
 
     def toggle_image(self):
         self.image = not self.image
+
     def quit_program(self):
         exit(0)
 
@@ -126,26 +124,23 @@ class App:
         valid = False
         command = None
         while not valid:
-            command = self.input_handler.input(PROMPT)
+            command = input(PROMPT)
             command = command.lower() if command.isalpha() else command
             if command in self.commands:
                 valid = True
                 print()
                 self.commands[command]()
 
-    def validate_zip(self, zipcode):
-        return zipcode == "" or match(r'\d{5}-\d{4}|\d{5}|\d{9}', zipcode)
-
-    def get_zipcode(self):
+    def get_location(self):
         valid = False
         while not valid:
-            zipcode = self.input_handler.input('Enter Zipcode (5 or 9 digits) or hit [enter] to reset: ')
-            if zipcode == "c":
+            user_input = input('Enter location or press [enter] to reset: ')
+            if user_input == "c":
                 return
-            if zipcode == "" or self.validate_zip(zipcode):
-                self.zip = zipcode
-                valid = True
-                print()
+            if user_input == "":
+                self.location = None
+            else
+
             else:
                 print('Invalid Zipcode. Please re-enter zip or hit [c] to cancel.')
 
