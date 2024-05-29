@@ -9,12 +9,18 @@ class FramedText:
         self.width = width
         self.text_width = text_width
 
+    def line_length_ok(self):
+        return all([len(line) <= self.text_width for line in self.text.splitlines()])
+
     def display(self):
         CORNER = "#"
         VERT = "|"
         HORIZ = "="
         wrapped_text = textwrap.TextWrapper(width=self.text_width, replace_whitespace=False)
-        lines = wrapped_text.wrap(self.text)
+        if self.line_length_ok():
+            lines = self.text.splitlines()
+        else:
+            lines = wrapped_text.wrap(self.text)
 
         padding = (self.width - 2 - self.text_width) // 2
 

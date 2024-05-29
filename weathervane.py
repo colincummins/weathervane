@@ -98,8 +98,7 @@ class App:
     def get_quote(self):
         forecast = get_forecast(self.location['zip'])
         if self.poem:
-            # Have to strip newlines to avoid issues w/ textwrap later
-            body = self.papi.get_poem(forecast).replace('\n', ' ')
+            body = self.papi.get_poem(forecast)
             author = "Original Poem by Weathervane"
         else:
             body, author = forecast_to_quote(forecast)
@@ -108,7 +107,9 @@ class App:
 
     def render_quote(self, quote: Quote) -> None:
         # Adapted from the Skrivener readme - https://github.com/bcliden/skrivener?tab=readme-ov-file
-        image_bytes = self.skrv.text_to_img(str(quote))
+
+        # We have to strip newlines out because Skrivener can't currently handle them
+        image_bytes = self.skrv.text_to_img(str(quote).replace('\n',' '))
         bytes_buffer = io.BytesIO(image_bytes)
         image = im.open(bytes_buffer)
         image.show()
@@ -116,8 +117,7 @@ class App:
 
     def display_quote(self):
         if not self.location:
-            print("You must set a location to receive weathervanes. Press (L) to enter.")
-            print()
+            print("You must set a location to receive weathervanes. Press (L) to enter.\n")
             return
         quote = self.get_quote()
         print()
