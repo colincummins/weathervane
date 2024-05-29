@@ -1,3 +1,5 @@
+import json
+
 import zmq
 
 
@@ -19,7 +21,6 @@ class ZipfinderAPI:
         }
         self.socket.send_json(request_json)
         reply = self.socket.recv_json()
-        if reply['status'] == 'Error':
-            raise Exception(reply['message'])
-
+        if reply['status'] == 'error':
+            raise Exception(reply['payload'])
         return reply['payload']
