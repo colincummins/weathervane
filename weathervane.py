@@ -7,6 +7,7 @@ from forecast_to_quote import forecast_to_quote
 from get_forecast import get_forecast
 from skrivenerAPI import SkrivenerAPI
 from zipfinderAPI import ZipfinderAPI
+from poeterAPI import PoeterAPI
 from PIL import Image as im
 import io
 
@@ -26,11 +27,12 @@ MENU = [
     "Type (L)ocation to set/change/clear your location (required)",
     "Type (A)bout to know more about Weathervane",
     "Type (I) to toggle image mode >>>NEW<<<",
+    "Type (P) to toggle poem mode >>>NEW<<<",
     "Type (V) to toggle voice mode",
     "Type (Z) to toggle zipcode display",
     "Type (Q)uit to end program"
 ]
-PROMPT = "[(Enter)/(L)ocation/(A)bout/(I)mage/(V)oice/(Z)ipcode Display/(Q)uit]:"
+PROMPT = "[(Enter)/(L)ocation/(A)bout/(I)mage/(P)oem/(V)oice/(Z)ipcode Display/(Q)uit]:"
 ABOUT = ("I wrote Weathervane to inspire and inform users by displaying a random quote based on the weather forecast for\
  their zip code. You can set your zipcode by pressing 'z'. You can change the zipcode by pressing 'z'. You can also\
   just hit enter at the zipcode prompt to clear it. I would like to add the ability to save your zipcode, save\
@@ -50,6 +52,7 @@ class App:
         self.prompt = PROMPT
         self.voice = True
         self.image = True
+        self.poem = False
         self.display_zip = True
         self.menu_commands = {
             '': self.display_quote,
@@ -58,11 +61,13 @@ class App:
             'v': self.toggle_voice,
             'i': self.toggle_image,
             'z': self.toggle_zip_display,
-            'a': self.display_about
+            'a': self.display_about,
+            'p': self.toggle_poem
         }
         self.voice_api = VoiceAPI()
         self.skrv = SkrivenerAPI()
         self.zipf = ZipfinderAPI()
+        self.papi = PoeterAPI()
 
     def display_title(self):
         print(self.title)
@@ -88,12 +93,16 @@ class App:
         return self.location['placename']
 
     def display_status(self):
-        print('(L)ocation:', self.get_location_display() or "NONE ('L' to set)", "(I)mage Mode:", "ON" if self.image else "OFF", \
-              "(V)oice Mode:", "ON" if self.voice else "OFF")
+        print('(L)ocation:', self.get_location_display() or "NONE ('L' to set)", "(I)mage Mode:", "ON" if self.image else "OFF","(P)oem Mode:", "ON" if self.poem else "OFF", "(V)oice Mode:", "ON" if self.voice else "OFF")
 
     def get_quote(self):
         forecast = get_forecast(self.location['zip'])
-        body, author = forecast_to_quote(forecast)
+        if self.poem:
+            # Have to strip newlines to avoid issues w/ textwrap later
+            body = self.papi.get_poem(forecast).replace('\n', ' ')
+            author = "Original Poem by Weathervane"
+        else:
+            body, author = forecast_to_quote(forecast)
         new_quote = Quote(body, author)
         return new_quote
 
@@ -128,7 +137,11 @@ class App:
     def toggle_zip_display(self):
         self.display_zip = not self.display_zip
 
-    def quit_program(self):
+    def toggle_poem(self):
+        self.poem = not self.poem
+
+    @staticmethod
+    def quit_program():
         exit(0)
 
     def process_command(self):
