@@ -3,8 +3,6 @@ import os
 from framed_text import FramedText
 from Quote import Quote
 from voice_api import VoiceAPI
-from input_handler import InputHandler
-from re import match
 from forecast_to_quote import forecast_to_quote
 from get_forecast import get_forecast
 from skrivenerAPI import SkrivenerAPI
