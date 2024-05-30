@@ -23,16 +23,18 @@ TITLE = """
 TAGLINE = "Weathervane - Get a quote inspired by today's weather!"
 PRIVACY_NOTE = "NOTE: This app requires you enter your zipcode \nwhich may be considered private information"
 MENU = [
-    "Type (E)nter to hear quote inspired by your local weather (Quote will also print)",
-    "Type (L)ocation to set/change/clear your location (required)",
-    "Type (A)bout to know more about Weathervane",
+    "Type [Enter] to hear quote inspired by your local weather (Quote will also print)",
+    "Type (S) to save current quote to your archive",
+    "Type (R) to retrieve a random quote from your archive",
+    "Type (L) set/change/clear your Location (required)",
+    "Type (A) to know more about Weathervane",
     "Type (I) to toggle image mode >>>NEW<<<",
     "Type (P) to toggle poem mode >>>NEW<<<",
     "Type (V) to toggle voice mode",
-    "Type (Z) to toggle zipcode display",
+    "Type (Z) to toggle zipcode display >>>NEW<<<",
     "Type (Q)uit to end program"
 ]
-PROMPT = "[(Enter)/(L)ocation/(A)bout/(I)mage/(P)oem/(V)oice/(Z)ipcode Display/(Q)uit]:"
+PROMPT = "[(Enter)/(L)ocation/(A)bout/(I)mage/(P)oem/(V)oice/(Z)ipcode Display/(S)ave Current Quote/(R)andom Archive Quote/(Q)uit]:"
 ABOUT = ("I wrote Weathervane to inspire and inform users by displaying a random quote based on the weather forecast for\
  their zip code. You can set your zipcode by pressing 'z'. You can change the zipcode by pressing 'z'. You can also\
   just hit enter at the zipcode prompt to clear it. I would like to add the ability to save your zipcode, save\
@@ -54,6 +56,7 @@ class App:
         self.image = True
         self.poem = False
         self.display_zip = True
+        self.current_quote = None
         self.menu_commands = {
             '': self.display_quote,
             'l': self.input_location,
@@ -62,6 +65,8 @@ class App:
             'i': self.toggle_image,
             'z': self.toggle_zip_display,
             'a': self.display_about,
+            's': self.save_quote,
+            'r': self.random_quote,
             'p': self.toggle_poem
         }
         self.voice_api = VoiceAPI()
@@ -103,6 +108,7 @@ class App:
         else:
             body, author = forecast_to_quote(forecast)
         new_quote = Quote(body, author)
+        self.current_quote = new_quote
         return new_quote
 
     def render_quote(self, quote: Quote) -> None:
@@ -139,6 +145,14 @@ class App:
 
     def toggle_poem(self):
         self.poem = not self.poem
+
+    def save_quote(self):
+        if self.current_quote:
+            pass
+        print('You have not displayed a quote yet')
+
+    def random_quote(self):
+        pass
 
     @staticmethod
     def quit_program():
