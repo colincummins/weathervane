@@ -108,7 +108,6 @@ class App:
         else:
             body, author = forecast_to_quote(forecast)
         new_quote = Quote(body, author)
-        self.current_quote = new_quote
         return new_quote
 
     def render_quote(self, quote: Quote) -> None:
