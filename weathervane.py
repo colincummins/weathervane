@@ -8,6 +8,7 @@ from get_forecast import get_forecast
 from skrivenerAPI import SkrivenerAPI
 from zipfinderAPI import ZipfinderAPI
 from poeterAPI import PoeterAPI
+from quoteArchiveAPI import QuoteArchiveAPI
 from PIL import Image as im
 import io
 
@@ -73,6 +74,7 @@ class App:
         self.skrv = SkrivenerAPI()
         self.zipf = ZipfinderAPI()
         self.papi = PoeterAPI()
+        self.qarch = QuoteArchiveAPI()
 
     def display_title(self):
         print(self.title)
@@ -125,6 +127,7 @@ class App:
             print("You must set a location to receive weathervanes. Press (L) to enter.\n")
             return
         quote = self.get_quote()
+        self.current_quote = quote
         print()
         FramedText(quote.get_body(), header="Weathervane for " + self.location['placename'], footer=quote.get_author()).display()
         print()
@@ -149,10 +152,18 @@ class App:
         if not self.current_quote:
             print('You have not displayed a quote yet')
         else:
-            pass
+            self.qarch.archive_quote(self.current_quote)
 
     def random_quote(self):
-        pass
+        quote = self.qarch.get_random()
+        print()
+        FramedText(quote.get_body(), header="From Your Archives", footer=quote.get_author()).display()
+        print()
+        if self.voice:
+            self.voice_api.say_quote(quote.get_body(), quote.get_author())
+        if self.image:
+            self.render_quote(quote)
+
 
     @staticmethod
     def quit_program():
