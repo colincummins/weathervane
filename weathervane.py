@@ -147,9 +147,10 @@ class App:
         self.poem = not self.poem
 
     def save_quote(self):
-        if self.current_quote:
+        if not self.current_quote:
+            print('You have not displayed a quote yet')
+        else:
             pass
-        print('You have not displayed a quote yet')
 
     def random_quote(self):
         pass
