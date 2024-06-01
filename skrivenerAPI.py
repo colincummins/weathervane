@@ -13,6 +13,7 @@ class SkrivenerAPI:
         context = zmq.Context()
         self.socket = context.socket(zmq.REQ)
         self.socket.connect(f"tcp://{host}:{port}")
+        print("Skrivener API initialized at port {}".format(port))
 
     def text_to_img(self, text: str, bg_color: str = None, text_color: str = None) -> bytes:
         packet = {"text": text}
