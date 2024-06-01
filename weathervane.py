@@ -54,7 +54,7 @@ class App:
         self.location = None
         self.prompt = PROMPT
         self.voice = True
-        self.image = True
+        self.image = False
         self.poem = False
         self.display_zip = True
         self.current_quote = None
@@ -100,7 +100,9 @@ class App:
         return self.location['placename']
 
     def display_status(self):
-        print('(L)ocation:', self.get_location_display() or "NONE ('L' to set)", "(I)mage Mode:", "ON" if self.image else "OFF","(P)oem Mode:", "ON" if self.poem else "OFF", "(V)oice Mode:", "ON" if self.voice else "OFF")
+        print('(L)ocation:', self.get_location_display() or "NONE ('L' to set)", "(I)mage Mode:",
+              "ON" if self.image else "OFF", "(P)oem Mode:", "ON" if self.poem else "OFF", "(V)oice Mode:",
+              "ON" if self.voice else "OFF")
 
     def get_quote(self):
         forecast = get_forecast(self.location['zip'])
@@ -116,7 +118,7 @@ class App:
         # Adapted from the Skrivener readme - https://github.com/bcliden/skrivener?tab=readme-ov-file
 
         # We have to strip newlines out because Skrivener can't currently handle them
-        image_bytes = self.skrv.text_to_img(str(quote).replace('\n',' '))
+        image_bytes = self.skrv.text_to_img(str(quote).replace('\n', ' '))
         bytes_buffer = io.BytesIO(image_bytes)
         image = im.open(bytes_buffer)
         image.show()
@@ -129,7 +131,8 @@ class App:
         quote = self.get_quote()
         self.current_quote = quote
         print()
-        FramedText(quote.get_body(), header="Weathervane for " + self.location['placename'], footer=quote.get_author()).display()
+        FramedText(quote.get_body(), header="Weathervane for " + self.location['placename'],
+                   footer=quote.get_author()).display()
         print()
         if self.voice:
             self.voice_api.say_quote(quote.get_body(), quote.get_author())
@@ -163,7 +166,6 @@ class App:
             self.voice_api.say_quote(quote.get_body(), quote.get_author())
         if self.image:
             self.render_quote(quote)
-
 
     @staticmethod
     def quit_program():
@@ -212,6 +214,6 @@ class App:
 
 
 if __name__ == "__main__":
-    os.system("cls||clear||")
+    os.system('clear' if os.name == 'posix' else 'cls')
     app = App()
     app.mainloop()
