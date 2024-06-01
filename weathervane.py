@@ -100,7 +100,10 @@ class App:
         return self.location['placename']
 
     def display_status(self):
-        print('(L)ocation:', self.get_location_display() or "NONE ('L' to set)", "(I)mage Mode:",
+        print()
+        FramedText(self.get_location_display() or "None",header="Location",footer="(L) to set/reset").display()
+        print()
+        print("(I)mage Mode:",
               "ON" if self.image else "OFF", "(P)oem Mode:", "ON" if self.poem else "OFF", "(V)oice Mode:",
               "ON" if self.voice else "OFF")
 
@@ -156,6 +159,9 @@ class App:
             print('You have not displayed a quote yet')
         else:
             self.qarch.archive_quote(self.current_quote)
+            print()
+            FramedText("Your quote has been archived").display()
+            print()
 
     def random_quote(self):
         quote = self.qarch.get_random()
